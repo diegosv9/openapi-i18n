@@ -1,0 +1,385 @@
+---
+import "@scalar/api-reference/style.css"
+import type { LanguageDefinition } from "../lib/i18n"
+
+type Props = {
+  documents: LanguageDefinition[]
+}
+
+const { documents } = Astro.props
+---
+
+<div class="scalar-root">
+  <div class="scalar-language-transition-overlay" aria-hidden="true"></div>
+  <div
+    id="api-reference"
+    data-documents={JSON.stringify(documents)}
+  ></div>
+</div>
+
+<script>
+  import "../scripts/mount-scalar-reference"
+</script>
+
+<style is:global>
+  .scalar-root {
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+    position: relative;
+    transition:
+      opacity 360ms ease,
+      filter 360ms ease;
+    transform: translateZ(0);
+  }
+
+  .scalar-root--language-transition {
+    pointer-events: none;
+  }
+
+  .scalar-language-transition-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    opacity: 0;
+    pointer-events: none;
+    /* fade-out: slow and smooth */
+    transition: opacity 300ms ease-out;
+    /* solid color avoids repaint on each frame; GPU-composited */
+    background: var(--scalar-background-1, white);
+    will-change: opacity;
+  }
+
+  /* fade-in: fast, so content is hidden before it changes */
+  .scalar-language-transition-overlay[data-active="true"] {
+    opacity: 1;
+    transition: opacity 120ms ease-in;
+  }
+
+  .scalar-root > #api-reference,
+  .scalar-root > #api-reference > .scalar-app,
+  .scalar-root .references-layout {
+    height: 100%;
+    min-height: 100%;
+  }
+
+  .scalar-root .references-rendered,
+  .scalar-root .t-doc__sidebar {
+    max-height: 100dvh;
+    overflow: auto;
+    scrollbar-gutter: stable;
+  }
+
+  /* Hide scrollbar thumb during transition to avoid flicker while overlay fades in */
+  .scalar-root--language-transition .references-rendered,
+  .scalar-root--language-transition .t-doc__sidebar {
+    scrollbar-color: transparent transparent;
+  }
+
+  .scalar-sidebar-brandbar {
+    display: block;
+    padding: 24px 20px 16px;
+    background: var(--scalar-sidebar-background-1);
+  }
+
+  .scalar-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .scalar-sidebar-brand__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, #1f3251, #67a6dd);
+    box-shadow: 0 12px 26px rgba(37, 60, 97, 0.18);
+    flex: none;
+  }
+
+  .scalar-sidebar-brand__logo {
+    display: none;
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 14px;
+  }
+
+  .scalar-sidebar-brand__fallback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .scalar-sidebar-brand__mark[data-has-logo="true"] {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .scalar-sidebar-brand__mark[data-has-logo="true"] .scalar-sidebar-brand__fallback {
+    display: none;
+  }
+
+  .scalar-sidebar-brand__mark[data-has-logo="true"] .scalar-sidebar-brand__logo--light {
+    display: block;
+  }
+
+  .dark-mode .scalar-sidebar-brand__mark[data-has-logo="true"] .scalar-sidebar-brand__logo--light {
+    display: none;
+  }
+
+  .dark-mode .scalar-sidebar-brand__mark[data-has-logo="true"] .scalar-sidebar-brand__logo--dark {
+    display: block;
+  }
+
+  .scalar-sidebar-brand__copy {
+    display: grid;
+    min-width: 0;
+  }
+
+  .scalar-sidebar-brand__copy strong {
+    font-size: 1rem;
+    line-height: 1.1;
+    color: var(--scalar-sidebar-color-1);
+    letter-spacing: -0.03em;
+  }
+
+  .scalar-sidebar-brand__copy span {
+    font-size: 0.78rem;
+    color: var(--scalar-sidebar-color-2);
+  }
+
+  .scalar-header-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-left: auto;
+    width: max-content;
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+
+  /* Hide Scalar's original toggle — kept in the DOM for Vue reactivity */
+  .scalar-header-theme-toggle {
+    display: none !important;
+  }
+
+  /* Custom pill theme toggle */
+  .scalar-theme-pill {
+    appearance: none;
+    -webkit-appearance: none;
+    border: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    width: 52px;
+    height: 28px;
+    border-radius: 999px;
+    background: var(--scalar-background-2, #f1f4f9);
+    outline: 1.5px solid var(--scalar-border-color, rgba(0, 0, 0, 0.1));
+    padding: 0;
+    flex-shrink: 0;
+    order: 2;
+    transition:
+      background 240ms ease,
+      outline-color 240ms ease;
+  }
+
+  .scalar-theme-pill:focus-visible {
+    outline: 2px solid var(--scalar-color-accent, #5046e5);
+    outline-offset: 2px;
+  }
+
+  .scalar-theme-pill[data-dark="true"] {
+    background: #5046e5;
+    outline-color: transparent;
+  }
+
+  .scalar-theme-pill__thumb {
+    position: absolute;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.15),
+      0 0 1px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* light mode: thumb at right edge */
+    transform: translateX(26px);
+    transition:
+      transform 240ms ease,
+      background 240ms ease,
+      box-shadow 240ms ease;
+  }
+
+  .scalar-theme-pill[data-dark="true"] .scalar-theme-pill__thumb {
+    /* dark mode: thumb at left edge */
+    transform: translateX(0);
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow: none;
+  }
+
+  .scalar-theme-pill__sun {
+    display: block;
+    color: #f59e0b;
+  }
+
+  .scalar-theme-pill__moon {
+    display: none;
+    color: #c7d2fe;
+  }
+
+  .scalar-theme-pill[data-dark="true"] .scalar-theme-pill__sun {
+    display: none;
+  }
+
+  .scalar-theme-pill[data-dark="true"] .scalar-theme-pill__moon {
+    display: block;
+  }
+
+  .scalar-language-switch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid var(--scalar-border-color);
+    border-radius: 6px;
+    background: transparent;
+    flex: 0 0 auto;
+    overflow: visible;
+    position: relative;
+    z-index: 1;
+    order: 1;
+  }
+
+  .scalar-language-switch__button {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--scalar-color-2, #5f6b7a);
+    border-radius: 4px;
+    min-width: 40px;
+    height: 28px;
+    padding: 0 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      background-color 120ms ease,
+      color 120ms ease;
+  }
+
+  .scalar-language-switch__button:hover {
+    color: var(--scalar-color-1, #243447);
+    background: var(--scalar-background-2, rgba(148, 163, 184, 0.12));
+  }
+
+  .scalar-language-switch__button[data-active="true"] {
+    color: var(--scalar-color-1, #132033);
+    background: var(--scalar-background-2, #eef4fb);
+  }
+
+  .scalar-reference-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 64px;
+    padding: 14px 18px 10px 0;
+    margin-bottom: 6px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 1px solid var(--scalar-border-color);
+    background: color-mix(
+      in srgb,
+      var(--scalar-background-1) 92%,
+      transparent
+    );
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  .references-rendered .narrow-references-container {
+    padding-top: 0;
+  }
+
+  .references-rendered .narrow-references-container > .introduction-section {
+    padding-top: 18px;
+  }
+
+  .t-doc__sidebar .my-2 {
+    margin-top: 14px !important;
+    padding: 0 20px;
+  }
+
+  .t-doc__sidebar .my-2 + * {
+    margin-top: 10px;
+  }
+
+  .t-doc__sidebar {
+    backdrop-filter: blur(10px);
+  }
+
+  .light-mode .scalar-root,
+  .scalar-root {
+    background:
+      radial-gradient(circle at top left, rgba(235, 242, 252, 0.9), transparent 30%),
+      linear-gradient(180deg, #ffffff, #fbfcfe 32%, #ffffff 100%);
+  }
+
+
+
+  .dark-mode .scalar-root {
+    background:
+      radial-gradient(circle at top left, rgba(48, 76, 112, 0.28), transparent 26%),
+      linear-gradient(180deg, #111315, #121417 32%, #111315 100%);
+  }
+
+  .dark-mode .scalar-reference-header {
+    border-bottom-color: var(--scalar-border-color);
+    background: color-mix(
+      in srgb,
+      var(--scalar-background-1) 78%,
+      transparent
+    );
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .dark-mode .scalar-language-switch__button:hover {
+    background: rgba(71, 85, 105, 0.24);
+  }
+
+  .dark-mode .scalar-language-switch__button[data-active="true"] {
+    background: rgba(71, 85, 105, 0.32);
+  }
+
+  @media (max-width: 900px) {
+    .scalar-reference-header {
+      padding: 12px 14px 8px 0;
+    }
+
+    .scalar-header-controls {
+      gap: 10px;
+    }
+  }
+</style>

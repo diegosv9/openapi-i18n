@@ -1,0 +1,19 @@
+---
+import { LANGUAGES } from "../../lib/i18n"
+
+export function getStaticPaths() {
+  return LANGUAGES.map((language) => ({
+    params: { lang: language.code },
+  }))
+}
+
+const targetLanguage = Astro.params.lang ?? "es"
+---
+
+<html>
+  <head>
+    <meta http-equiv="refresh" content={`0;url=/api?lang=${targetLanguage}`} />
+    <link rel="canonical" href={`/api?lang=${targetLanguage}`} />
+  </head>
+  <body></body>
+</html>

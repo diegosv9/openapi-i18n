@@ -1,0 +1,38 @@
+{
+  "name": "openapi-i18n",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "type": "module",
+  "scripts": {
+    "sync:i18n": "node --import tsx scripts/sync-openapi-i18n.ts",
+    "build:i18n": "node --import tsx scripts/build-openapi-locale.ts",
+    "validate:i18n": "node --import tsx scripts/validate-i18n.ts",
+    "check:i18n": "node --import tsx scripts/check-missing-translations.ts",
+    "build:all": "node --import tsx scripts/sync-openapi-i18n.ts && node --import tsx scripts/validate-i18n.ts && node --import tsx scripts/build-openapi-locale.ts",
+    "dev": "pnpm --silent build:all && astro dev",
+    "build": "pnpm --silent build:all && astro build",
+    "preview": "astro preview",
+    "test": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:coverage:serve": "node scripts/serve-coverage.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.2",
+    "@vitest/coverage-v8": "^4.1.4",
+    "@vitest/ui": "^4.1.4",
+    "astro": "^6.1.5",
+    "playwright": "^1.59.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.4",
+    "vitest-monocart-coverage": "^4.0.2",
+    "yaml": "^2.8.3"
+  },
+  "dependencies": {
+    "@scalar/api-reference": "^1.51.0",
+    "@scalar/cli": "^1.8.3"
+  }
+}

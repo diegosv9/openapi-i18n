@@ -1,0 +1,12 @@
+---
+import ScalarReference from "../components/ScalarReference.astro"
+import SiteLayout from "../layouts/SiteLayout.astro"
+import { LANGUAGES } from "../lib/i18n"
+---
+
+<SiteLayout
+  title="OpenAPI i18n POC · Scalar"
+  description="Una sola referencia Scalar con selector interno de idioma sincronizado con la URL."
+>
+  <ScalarReference documents={LANGUAGES} />
+</SiteLayout>
